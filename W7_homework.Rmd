@@ -1,0 +1,99 @@
+---
+title: "W7"
+author: "Solvej"
+date: "13/10/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r libraries, echo=FALSE}
+library(tidyverse)
+library(gganimate)
+library(gifski)
+library(av)
+library(gapminder)
+```
+
+```{r}
+str(gapminder)
+```
+
+
+## Task 1
+Define a defensive function that calculates the Gross Domestic Product of a nation from the data available in the gapminder dataset. You can use the population and GDPpercapita columns for it. Using that function, calculate the GDP of Denmark in the following years: 1967, 1977, 1987, 1997, 2007, and 2017.
+
+```{r}
+# Based on the carpentry tutorial, I define a function 
+# that takes a dataset and multiplies the population column
+# with the GDP per capita column:
+
+calcGDP <- function(dat, year=NULL, country=NULL) { #adding year and country as arguments
+  if(!is.null(year)) {
+    dat <- dat[dat$year %in% year, ] #subsets the data by year if the year column isn't empty
+  }
+  if (!is.null(country)) {
+    dat <- dat[dat$country %in% country,] #subsets the result by country if the country argument isn't empty
+  }
+  gdp <- dat$pop * dat$gdpPercap #calculates gdp
+
+  new <- cbind(dat, gdp=gdp) #adds gdp as a new column to the subsetted data
+  return(new)
+}
+```
+
+Now I can use this function to calculate the GDP of Denmark in the given years. 
+To make it easier for myself, I save the years as a vector first:
+```{r}
+years <- c(1967,1977,1987,1997,2007,2017)
+```
+Then I calculate the GDP:
+```{r}
+calcGDP(gapminder, year = years, country = "Denmark")
+```
+
+## Task 2
+Write a script that loops over each country in the gapminder dataset, tests whether the country starts with a ‘B’ , and prints out whether the life expectancy is smaller than 50, between 50 and 70, or greater than 70. (Hint: remember the grepl functions, and review the Control Flow tutorial)
+
+```{r}
+# Printing the countries that start with B
+candidateCountries <- grep("^B", unique(gapminder$country), value = TRUE)
+
+for (iCountry in candidateCountries) {
+    print(iCountry)
+}
+```
+
+
+```{r, eval=FALSE}
+#Trying to use the function from the gapminder tutorial to print whether mean life expectancy
+#is under 50, 50-70, or over 70.
+#It doesn't work, and I don't know why.
+lowerThreshold <- 50
+upperThreshold <- 70
+
+for (iCountry in candidateCountries) {
+    tmp <- mean(gapminder[gapminder$country == iCountry, "lifeExp"])
+
+    if(tmp < lowerThreshold) {
+        cat("Average Life Expectancy in", iCountry, "is less than", lowerThreshold, "\n")
+    } else if(tmp > lowerThreshold && tmp < upperThreshold) {
+        cat("Average Life Expectancy in", iCountry, "is between", lowerThreshold, "and", upperThreshold, "\n")
+    } else {
+        cat("Average Life Expectancy in", iCountry, "is greater than", upperThreshold, "\n")
+    }
+    rm(tmp)
+}
+```
+
+
+
+
+
+
+
+
+
